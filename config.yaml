@@ -1,0 +1,15 @@
+baseURL: jcgloria.github.io
+languageCode: en-us
+title: jcgloria
+theme: mini
+
+permalinks:
+  posts: /posts/:title/
+
+social:
+  github: https://github.com/jcgloria
+
+params:
+  author: Juan Carlos Gloria
+  bio: Software Engineer
+  description: My Blog
