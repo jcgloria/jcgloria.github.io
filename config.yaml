@@ -13,5 +13,5 @@ params:
   author: Juan Carlos Gloria
   bio: Software Engineer
   description: My Blog
-  showToc: true
   copyright: ' ' 
+  showPowerBy: false
