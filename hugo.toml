@@ -1,4 +1,4 @@
-baseURL = 'http://example.org/'
+baseURL = 'jcgloria.github.io'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'jcgloria'
 theme = 'mini'
