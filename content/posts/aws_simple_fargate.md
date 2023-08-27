@@ -6,8 +6,13 @@ tags:
     - "docker"
     - "fargate"
     - "python"
+    - "terraform"
 ---
-### This project shows an introduction to ECS and Fargate. The objective is to run a simple python script with dependencies in Fargate. The project creates the necessary infrastructure with Terraform, builds a python docker image, and runs the task in Fargate.
+### This guide shows an introduction to ECS and Fargate. The objective is to run a simple python script with dependencies in Fargate. The project creates the necessary infrastructure with Terraform, builds a python docker image, and runs the task in Fargate.
+
+# Prerequisites
+This guide assumes Terraform, Docker, and the AWS CLI are installed and configured.
+
 # Python Container
 
 1. Create a `Dockerfile` for the container you wish to run. In this example we will run a simple python script with dependencies using the official python docker image.
