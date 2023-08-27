@@ -215,7 +215,7 @@ terraform apply
 
 1. Get AWS credentials to push the docker image to ECR
 ```bash
-aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-repository-url>
+aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <your-repository-url>
 ```
 
 2. Build the docker image with the ECR repository name
