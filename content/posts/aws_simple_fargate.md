@@ -65,6 +65,7 @@ provider "aws" {
   region = var.region
 }
 
+# ECR Repository
 resource "aws_ecr_repository" "my_repo" {
   name         = var.repo_name
   force_delete = true
@@ -74,11 +75,12 @@ resource "aws_ecr_repository" "my_repo" {
   }
 }
 
+# ECS Cluster
 resource "aws_ecs_cluster" "cluster" {
   name = var.cluster_name
 }
 
-
+# ECS Task Execution Role
 resource "aws_iam_role" "task_execution_role" {
   name = "my_task_execution_role"
   assume_role_policy = jsonencode({
@@ -95,6 +97,7 @@ resource "aws_iam_role" "task_execution_role" {
   )
 }
 
+# ECS Task Execution Policy (Add extra permissions to the task execution role if needed)
 resource "aws_iam_policy" "task_execution_policy"{
     name = "my_ecs_task_execution_policy"
     policy = jsonencode({
@@ -117,12 +120,13 @@ resource "aws_iam_policy" "task_execution_policy"{
     })
 }
 
+# Attach the policy to the role
 resource "aws_iam_role_policy_attachment" "task_execution_policy_attachment" {
     role = aws_iam_role.task_execution_role.name
     policy_arn = aws_iam_policy.task_execution_policy.arn
 }
 
-
+# ECS Fargate Task Definition + Container Definition
 resource "aws_ecs_task_definition" "task" {
   family                   = var.task_name
   requires_compatibilities = ["FARGATE"]
@@ -151,6 +155,8 @@ resource "aws_ecs_task_definition" "task" {
 ]
 DEFINITION
 }
+
+# Outputs for clearer visibility in the terminal
 
 output "repository_url" {
   value = aws_ecr_repository.my_repo.repository_url
@@ -239,6 +245,15 @@ DEFAULT_SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$DEFAUL
 ```bash
 aws ecs run-task --cluster my_cluster --task-definition my_task --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$DEFAULT_SUBNETS],assignPublicIp=ENABLED}"
 ```
+
+# Pull the logs from the task
+
+When the task is done, you can get the latest log stream from the task's log group `ecs/my_task` and print the log events. This can be achieved with the following command.
+```bash
+aws logs describe-log-streams --log-group-name ecs/my_task --order-by LastEventTime --descending --limit 1 | jq -r '.logStreams[0].logStreamName' | xargs -I {} aws logs get-log-events --log-group-name ecs/my_task --log-stream-name {}
+```
+
+
 
 
 
