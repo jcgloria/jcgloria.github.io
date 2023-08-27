@@ -10,6 +10,8 @@ tags:
 ---
 ### This guide shows an introduction to ECS and Fargate. The objective is to run a simple python script with dependencies in Fargate. The project creates the necessary infrastructure with Terraform, builds a python docker image, and runs the task in Fargate.
 
+## Project repo: https://github.com/jcgloria/simple_ecs_fargate
+
 # Prerequisites
 - This guide assumes Terraform, Docker, and the AWS CLI are installed and configured.
 
