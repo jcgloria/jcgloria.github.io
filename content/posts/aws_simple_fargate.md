@@ -1,7 +1,6 @@
 ---
 title: "Running background jobs with AWS Fargate, Docker, and Python"
 date: 2023-08-27T08:00:00+01:00
-draft: true
 tags: 
     - "aws"
     - "docker"
