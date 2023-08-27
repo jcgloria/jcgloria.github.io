@@ -1,5 +1,6 @@
 ---
 title: "Running background jobs with AWS Fargate, Docker, and Python"
+description: "This project shows an introduction to ECS and Fargate. The objective is to run a simple python script with dependencies in Fargate. The project creates the necessary infrastructure with Terraform, builds a python docker image, and runs the task in Fargate."
 date: 2023-08-27T01:00:00+01:00
 tags: 
     - "aws"
@@ -8,7 +9,41 @@ tags:
     - "python"
 ---
 
+# Python Container
+
+1. Create a `Dockerfile` for the container you wish to run. In this example we will run a simple python script with dependencies using the official python docker image.
+```dockerfile
+# Add linux/amd64 option if running on ARM architecture (e.g. M1 mac)
+FROM --platform=linux/amd64 python:3 
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD [ "python", "./main.py" ]
+```
+
+2. Create a `requirements.txt` file with the dependencies of your python script
+```txt
+requests==2.31.0
+```
+
+3. Create a `main.py` file with the python script you wish to run
+```python
+import requests
+
+print("Hello from Fargate")
+
+r = requests.get('https://jsonplaceholder.typicode.com/todos/1')
+
+print(r.json())
+```
+
 # Terraform
+
 1. Create a new terraform project
 ```bash
 terraform init
@@ -161,7 +196,12 @@ variable "repo_name" {
 }
 ```
 
-# Docker
+4. Apply the project in your AWS account
+```bash
+terraform apply
+```
+
+# Docker Image
 
 1. Get AWS credentials to push the docker image to ECR
 ```bash
@@ -170,17 +210,17 @@ aws ecr get-login-password --region <your-region> | docker login --username AWS 
 
 2. Build the docker image with the ECR repository name
 ```bash
-docker build -t <<repo_name>>
+docker build -t my_repo .
 ```
 
 3. Tag the docker image with the ECR repository name and the image tag
 ```bash
-docker tag <your-image-name>:<your-image-tag> <your-repository-url>:<your-image-tag>
+docker tag my_repo:latest <your-repository-url>:latest
 ```
 
 4. Push the docker image to ECR
 ```bash
-docker push <your-repository-url>:<your-image-tag>
+docker push <your-repository-url>:latest
 ```
 
 # AWS Fargate
