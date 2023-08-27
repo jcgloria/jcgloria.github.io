@@ -233,16 +233,16 @@ docker tag my_repo:latest <your-repository-url>:latest
 docker push <your-repository-url>:latest
 ```
 
-# AWS Fargate
+# Running the task with Fargate
 
-1. Make sure the default VPC is set up in the region the project was deployed. The VPC should have subnets with a route to the internet gateway. 
+1. Fargate, unlike lambda, needs to run inside a VPC. Make sure the default VPC is set up in the region the project was deployed. The VPC should have subnets with a route to the internet gateway. 
 
-2. Get the default VPC ID of your AWS account:
+2. Get the default VPC ID
 ```bash
 DEFAULT_VPC_ID=$(aws ec2 describe-vpcs --query "Vpcs[?IsDefault].VpcId | [0]" --output text)
 ```
 
-3. Get the default subnets of your AWS account:
+3. Get the default subnets using the default VPC ID
 ```bash
 DEFAULT_SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$DEFAULT_VPC_ID" --query "Subnets[*].SubnetId" --output text | tr '\t' ',')
 ```
