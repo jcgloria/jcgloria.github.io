@@ -1,6 +1,6 @@
 ---
 title: "Running Background Jobs with AWS Fargate, Docker, and Python"
-date: 2023-08-27T01:00:00+01:00
+date: 2023-08-27T02:16:00+01:00
 tags: 
     - "aws"
     - "docker"
@@ -235,7 +235,7 @@ docker push <your-repository-url>:latest
 
 # Running the task with Fargate
 
-1. Fargate, unlike lambda, needs to run inside a VPC. Make sure the default VPC is set up in the region the project was deployed. The VPC should have subnets with a route to the internet gateway. 
+1. Fargate, unlike Lambda, needs to run inside a VPC. Make sure the default VPC is set up in the region the project was deployed. The VPC should have subnets with a route to the internet gateway. 
 
 2. Get the default VPC ID
 ```bash
