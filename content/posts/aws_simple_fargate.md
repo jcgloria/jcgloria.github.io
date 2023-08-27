@@ -11,7 +11,7 @@ tags:
 ### This guide shows an introduction to ECS and Fargate. The objective is to run a simple python script with dependencies in Fargate. The project creates the necessary infrastructure with Terraform, builds a python docker image, and runs the task in Fargate.
 
 # Prerequisites
-This guide assumes Terraform, Docker, and the AWS CLI are installed and configured.
+- This guide assumes Terraform, Docker, and the AWS CLI are installed and configured.
 
 # Python Container
 
@@ -30,12 +30,12 @@ COPY . .
 CMD [ "python", "./main.py" ]
 ```
 
-2. Create a `requirements.txt` file with the dependencies of your python script
+2. Create a `requirements.txt` file with the dependencies of your python script.
 ```txt
 requests==2.31.0
 ```
 
-3. Create a `main.py` file with the python script you wish to run
+3. Create a `main.py` file with the python script you wish to run.
 ```python
 import requests
 
@@ -48,7 +48,7 @@ print(r.json())
 
 # Terraform
 
-1. Create a `main.tf` file with the following content
+1. Create a `main.tf` file with the following resources:
 ```terraform
 terraform {
   required_providers {
@@ -174,7 +174,7 @@ output "task_name" {
 }
 ```
 
-3. Define and adjust the terraform variables file `variables.tf` file with the following content
+3. Create the `variables.tf` file with the following content. Default values can be changed if needed.
 ```terraform
 variable "region" {
   description = "Region to deploy"
@@ -235,24 +235,26 @@ docker push <your-repository-url>:latest
 
 # AWS Fargate
 
-1. Get the default VPC ID of your AWS account
+1. Make sure the default VPC is set up in the region the project was deployed. The VPC should have subnets with a route to the internet gateway. 
+
+2. Get the default VPC ID of your AWS account:
 ```bash
 DEFAULT_VPC_ID=$(aws ec2 describe-vpcs --query "Vpcs[?IsDefault].VpcId | [0]" --output text)
 ```
 
-2. Get the default subnets of your AWS account
+3. Get the default subnets of your AWS account:
 ```bash
 DEFAULT_SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$DEFAULT_VPC_ID" --query "Subnets[*].SubnetId" --output text | tr '\t' ',')
 ```
 
-3. Run the task
+4. Run the task
 ```bash
 aws ecs run-task --cluster my_cluster --task-definition my_task --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$DEFAULT_SUBNETS],assignPublicIp=ENABLED}"
 ```
 
 # Pull the logs from the task
 
-When the task is done, you can get the latest log stream from the task's log group `ecs/my_task` and print the log events. This can be achieved with the following command.
+When the task is done, you can get the latest log stream from the task's log group `ecs/my_task` and print the log events.
 ```bash
 aws logs describe-log-streams --log-group-name ecs/my_task --order-by LastEventTime --descending --limit 1 | jq -r '.logStreams[0].logStreamName' | xargs -I {} aws logs get-log-events --log-group-name ecs/my_task --log-stream-name {}
 ```
