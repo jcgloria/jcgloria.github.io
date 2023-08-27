@@ -43,12 +43,7 @@ print(r.json())
 
 # Terraform
 
-1. Create a new terraform project
-```bash
-terraform init
-```
-
-2. Create a `main.tf` file with the following content
+1. Create a `main.tf` file with the following content
 ```terraform
 terraform {
   required_providers {
@@ -199,6 +194,11 @@ variable "repo_name" {
     type        = string
     default     = "my_repo"
 }
+```
+
+3. Initialize the terraform project
+```bash
+terraform init
 ```
 
 4. Apply the project in your AWS account
