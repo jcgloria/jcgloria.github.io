@@ -50,6 +50,8 @@ print(r.json())
 
 # Terraform
 
+With Terraform, we set up all the necessary infrastructure to run the task in Fargate. The infrastructure consists of an ECR repository, an ECS cluster, an ECS task definition, and an ECS task execution role.
+
 1. Create a `main.tf` file with the following resources:
 ```terraform
 terraform {
@@ -260,12 +262,3 @@ When the task is done, you can get the latest log stream from the task's log gro
 ```bash
 aws logs describe-log-streams --log-group-name ecs/my_task --order-by LastEventTime --descending --limit 1 | jq -r '.logStreams[0].logStreamName' | xargs -I {} aws logs get-log-events --log-group-name ecs/my_task --log-stream-name {}
 ```
-
-
-
-
-
-
-
-
-
