@@ -12,4 +12,4 @@ With the left panel, the user can filter log groups by prefix. Then, the user ca
 
 Check the github for this project: https://github.com/jcgloria/cloudwatcher
 
-![Cloudwatcher](../../images/cloudwatcher.png)
+![Cloudwatcher](/images/cloudwatcher.png)
