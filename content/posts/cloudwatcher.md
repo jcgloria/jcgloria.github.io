@@ -13,3 +13,5 @@ With the left panel, the user can filter log groups by prefix. Then, the user ca
 Check the github for this project: https://github.com/jcgloria/cloudwatcher
 
 ![Cloudwatcher](/images/cloudwatcher.png)
+
+The app requires to set aws access and secret keys using the gear icon in the top right. The application only requires the `FilterLogEvents` and `DescribeLogGroups` actions to work correctly. 
