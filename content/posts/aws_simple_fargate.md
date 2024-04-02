@@ -50,7 +50,9 @@ print(r.json())
 
 # Terraform
 
-With Terraform, we set up all the necessary infrastructure to run the task in Fargate. The infrastructure consists of an ECR repository, an ECS cluster, an ECS task definition, and an ECS task execution role.
+With Terraform, we set up all the necessary infrastructure to run the task in Fargate. The infrastructure in this template consists of an ECR repository, an ECS cluster, an ECS task definition, an ECS task execution role, and an ECS task role. 
+
+The task execution role is used by the ECS service to run the task. This role normally provides to ECS access to pull the docker image from ECR and write logs to CloudWatch. On the other hand, the task role is assumed by the task itself and can be used to access other AWS resources. In this terraform template, the policy attached to the task role is defined in the resource `my_ecs_task_role_policy`. As an example, this policy gives full S3 access to the container. Adjust the permissions as needed. 
 
 1. Create a `main.tf` file with the following resources:
 ```terraform
@@ -100,33 +102,73 @@ resource "aws_iam_role" "task_execution_role" {
   )
 }
 
-# ECS Task Execution Policy (Add extra permissions to the task execution role if needed)
-resource "aws_iam_policy" "task_execution_policy"{
-    name = "my_ecs_task_execution_policy"
-    policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [
-            {
-                Action = [
-                    "ecr:GetAuthorizationToken",
-                    "ecr:BatchCheckLayerAvailability",
-                    "ecr:GetDownloadUrlForLayer",
-                    "ecr:BatchGetImage",
-                    "logs:CreateLogStream",
-                    "logs:CreateLogGroup",
-                    "logs:PutLogEvents"
-                ]
-                Effect = "Allow"
-                Resource = "*"
-            },
+# ECS Task Execution Policy 
+resource "aws_iam_policy" "task_execution_policy" {
+  name = "my_ecs_task_execution_policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
         ]
-    })
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
 }
 
-# Attach the policy to the role
+# Attach the policy to the task execution role
 resource "aws_iam_role_policy_attachment" "task_execution_policy_attachment" {
-    role = aws_iam_role.task_execution_role.name
-    policy_arn = aws_iam_policy.task_execution_policy.arn
+  role       = aws_iam_role.task_execution_role.name
+  policy_arn = aws_iam_policy.task_execution_policy.arn
+}
+
+# ECS Task Role 
+resource "aws_iam_role" "task_role" {
+  name = "my_task_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      },
+    ] }
+  )
+}
+
+# ECS Task Policy
+resource "aws_iam_policy" "task_role_policy" {
+  name = "my_ecs_task_role_policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:*" # Full access to S3, adjust permissions as needed
+        ]
+        Effect   = "Allow"
+        Resource = "*" # You can limit the resources if needed
+      }
+    ]
+  })
+}
+
+# Attach the policy to the task role
+resource "aws_iam_role_policy_attachment" "task_role_policy_attachment" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = aws_iam_policy.task_role_policy.arn
 }
 
 # ECS Fargate Task Definition + Container Definition
@@ -134,6 +176,7 @@ resource "aws_ecs_task_definition" "task" {
   family                   = var.task_name
   requires_compatibilities = ["FARGATE"]
   execution_role_arn       = aws_iam_role.task_execution_role.arn
+  task_role_arn            = aws_iam_role.task_role.arn
   network_mode             = "awsvpc"
   cpu                      = 1024
   memory                   = 2048
@@ -178,39 +221,12 @@ output "task_name" {
 }
 ```
 
-3. Create the `variables.tf` file with the following content. Default values can be changed if needed.
-```terraform
-variable "region" {
-  description = "Region to deploy"
-  type        = string
-  default     = "eu-west-2"
-}
-
-variable "cluster_name" {
-    description = "Name of the ECS cluster"
-    type        = string
-    default     = "my_cluster"
-}
-
-variable "task_name" {
-    description = "Name of the ECS task definition"
-    type        = string
-    default     = "my_task"
-}
-
-variable "repo_name" {
-    description = "Name of the ECR repository"
-    type        = string
-    default     = "my_repo"
-}
-```
-
-3. Initialize the terraform project
+1. Initialize the terraform project
 ```bash
 terraform init
 ```
 
-4. Apply the project in your AWS account
+1. Apply the project in your AWS account
 ```bash
 terraform apply
 ```
