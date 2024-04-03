@@ -221,12 +221,39 @@ output "task_name" {
 }
 ```
 
-1. Initialize the terraform project
+2. Create a `variables.tf` file with the following variables:
+```terraform
+variable "region" {
+  description = "Region to deploy"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "cluster_name" {
+    description = "Name of the ECS cluster"
+    type        = string
+    default     = "my_cluster"
+}
+
+variable "task_name" {
+    description = "Name of the ECS task definition"
+    type        = string
+    default     = "my_task"
+}
+
+variable "repo_name" {
+    description = "Name of the ECR repository"
+    type        = string
+    default     = "my_repo"
+}
+```
+
+3. Initialize the terraform project
 ```bash
 terraform init
 ```
 
-1. Apply the project in your AWS account
+4. Apply the project in your AWS account
 ```bash
 terraform apply
 ```
@@ -235,7 +262,7 @@ terraform apply
 
 1. Get AWS credentials to push the docker image to ECR
 ```bash
-aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <your-repository-url>
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-repository-url>
 ```
 
 2. Build the docker image with the ECR repository name
