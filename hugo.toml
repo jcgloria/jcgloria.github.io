@@ -1,0 +1,4 @@
+baseURL = 'https://jcgloria.github.com'
+languageCode = 'en-us'
+title = 'Jcgloria Blog'
+theme = "paper"
