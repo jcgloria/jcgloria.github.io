@@ -24,7 +24,7 @@ In the Azure Portal, go to the Active Directory service (now called Microsoft En
 
 Once the application is registered, note the OAuth2 endpoint and the application client ID. The endpoint should look like this: `https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0`. This will be used to send the user to the Azure AD login page.
 
-Since this is a static website, we will use the implicit flow to get the tokens. This means that the identity provider will send the tokens directly to the callback URL. To enable implicit flow, click on the "Authentication" tab and check the boxes for "Access tokens" and "ID tokens" under the implicit flow section.
+There are multiple authentication flows that can be used to get the tokens from the OAuth2 endpoint. The best practice is to use the authorization code flow with PKCE, which adds an extra layer of security by requiring the client to prove it initiated the request, preventing interception attacks. For simplicity, we will use implicit flow which is quicker and shorter because it skips the code exchange step and directly returns tokens to the client. To enable implicit flow, click on the "Authentication" tab and check the boxes for "Access tokens" and "ID tokens" under the implicit flow section.
 
 The last step is to add the AD users that will be allowed to sign in. To do this, we navigate to "Enterprise Applications" in the Microsoft Entra ID portal and add the users to the application we registered under "Users and Groups".
 
